@@ -1,4 +1,5 @@
 from dep1.dep1 import Cls
+from dep1.dep1 import K
 from dep2 import dep2
 
 class A(Cls):
