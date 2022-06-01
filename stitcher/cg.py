@@ -30,7 +30,7 @@ class CallGraph:
         self.external_calls = []
         self.nodes = {}
         self.id_to_node = {}
-
+        self.modules=[]
         self.product = self.cg["product"]
         self.version = self.cg["version"]
 
@@ -81,8 +81,15 @@ class CallGraph:
                         self.id_to_node.get(src),
                         self.id_to_node.get(dst)])
             return res
+        
+        def get_modules(self):
+            modules = []
+            for module in self.id_to_node:
+                modules.append(self.id_to_node[module].to_string(True))
+            return modules
 
         iterate_mods(self.cg["modules"]["internal"], True)
+        self.modules = get_modules(self)
         iterate_mods(self.cg["modules"]["external"], False)
 
         self.internal_calls = iterate_calls(self.cg["graph"]["internalCalls"])

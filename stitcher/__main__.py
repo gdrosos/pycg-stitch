@@ -3,7 +3,7 @@ import json
 import argparse
 
 from stitcher.stitcher import Stitcher
-from stitcher.api import deploy
+from stitcher.reachability import ReachabilityDetector
 
 def main():
     parser = argparse.ArgumentParser()
@@ -17,34 +17,18 @@ def main():
         default=False
     )
     parser.add_argument(
-        "-o",
-        "--output",
-        help="Output path",
-        default=None
-    )
-    parser.add_argument(
-        "-a",
-        "--api",
-        action="store_true",
-        help="Deploy the server",
+        "-r",
+        "--root",
+        help="The root coordinate, including the product and the version, separated by a colon(:)",
         default=None
     )
 
     args = parser.parse_args()
 
-    if args.api:
-        deploy()
-        return
-
     stitcher = Stitcher(args.call_graph, args.simple)
     stitcher.stitch()
-
-    output = json.dumps(stitcher.output())
-    if args.output:
-        with open(args.output, "w+") as f:
-            f.write(output)
-    else:
-        print (output)
+    stitched = stitcher.output()
+    ReachabilityDetector(stitched, args.root)
 
 if __name__ == "__main__":
     main()
