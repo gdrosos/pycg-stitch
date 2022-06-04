@@ -1,4 +1,3 @@
-import sys
 import json
 import argparse
 
@@ -25,7 +24,7 @@ def main():
 
     args = parser.parse_args()
 
-    stitcher = Stitcher(args.call_graph, args.simple)
+    stitcher = Stitcher(args.call_graph, args.simple, args.root)
     stitcher.stitch()
     stitched = stitcher.output()
     ReachabilityDetector(stitched, args.root)

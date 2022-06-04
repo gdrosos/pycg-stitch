@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from stitcher.node import Node
-import json
 import pprint
 
 
@@ -16,7 +15,7 @@ class ReachabilityDetector:
         self.graph = self._load_to_networkx(callgraph)
         self.reach_all_nodes()
         self.extract_metrics()
-        self.draw()
+        # self.draw()
 
     
     def draw(self):
@@ -55,4 +54,5 @@ class ReachabilityDetector:
         self.metrics["version"] = self.root_version
         self.metrics["total_nodes"] = len(self.nodes)
         self.metrics["visited_nodes"] = len(self.visited_nodes)
-        # pprint.pprint(self.metrics)
+        print(1-(self.metrics["visited_nodes"]/self.metrics["total_nodes"]))
+        pprint.pprint(self.metrics)

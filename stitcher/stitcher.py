@@ -27,7 +27,8 @@ import json
 from stitcher.cg import CallGraph
 
 class Stitcher:
-    def __init__(self, call_graph_paths, simple):
+    def __init__(self, call_graph_paths, simple, root):
+        self.root = root.split(":")[0]
         self.simple = simple
         self.cgs = {}
         self.id_cnt = 0
@@ -51,14 +52,10 @@ class Stitcher:
             self.edges_cnt += len(internal_calls) + len(external_calls)
             self.edges_cnt_no_builtin += len(internal_calls) + len(external_calls)
             self.resolved_cnt += len(internal_calls)
-            print(product)
-            print("MODULESSS")
             for module in cg.modules:
-                print(module)
-                self._assign_id(module)
-            print("INTERNALLLLL")
+                if product ==self.root:
+                    self._assign_id(module)
             for src, dst in internal_calls:
-                print(src.to_string(self.simple), dst.to_string(self.simple))
                 self._assign_id(src.to_string(self.simple))
                 self._assign_id(dst.to_string(self.simple))
                 self.stitched["edges"].append([
@@ -67,7 +64,6 @@ class Stitcher:
                 ])
 
             for src, dst in external_calls:
-                # todo ask fro builtin?
                 if ".builtin" in dst.to_string():
                     self.edges_cnt_no_builtin -= 1
                 for resolved in self._resolve(dst):
