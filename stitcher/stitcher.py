@@ -52,9 +52,9 @@ class Stitcher:
             self.edges_cnt += len(internal_calls) + len(external_calls)
             self.edges_cnt_no_builtin += len(internal_calls) + len(external_calls)
             self.resolved_cnt += len(internal_calls)
-            for module in cg.modules:
-                if product ==self.root:
-                    self._assign_id(module)
+            for node in cg.node_list:
+                if node.is_func or node.is_class:
+                    self._assign_id(node.to_string(self.simple))
             for src, dst in internal_calls:
                 self._assign_id(src.to_string(self.simple))
                 self._assign_id(dst.to_string(self.simple))
