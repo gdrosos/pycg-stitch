@@ -45,7 +45,7 @@ class Stitcher:
 
         self._parse_cgs(call_graph_paths)
 
-    def stitch(self):
+    def stitch_for_rq1(self):
         for product, cg in self.cgs.items():
             internal_calls = cg.get_internal_calls()
             external_calls = cg.get_external_calls()
@@ -53,31 +53,38 @@ class Stitcher:
             self.edges_cnt_no_builtin += len(internal_calls) + len(external_calls)
             self.resolved_cnt += len(internal_calls)
             for node in cg.node_list:
-                if node.is_func or node.is_class:
+                if node.get_product()== self.root or node.is_func or node.is_class:
                     self._assign_id(node.to_string(self.simple))
             for src, dst in internal_calls:
-                self._assign_id(src.to_string(self.simple))
-                self._assign_id(dst.to_string(self.simple))
-                self.stitched["edges"].append([
-                    self.node_to_id[src.to_string(self.simple)],
-                    self.node_to_id[dst.to_string(self.simple)],
-                ])
-
+                if node.get_product()== self.root or node.is_func or node.is_class:
+                    self._handle_internals(src, dst)
             for src, dst in external_calls:
-                if ".builtin" in dst.to_string():
-                    self.edges_cnt_no_builtin -= 1
-                for resolved in self._resolve(dst):
-                    self.resolved_cnt += 1
-                    self._assign_id(src.to_string(self.simple))
-                    self._assign_id(resolved.to_string(self.simple))
-                    self.stitched["edges"].append([
-                        self.node_to_id[src.to_string(self.simple)],
-                        self.node_to_id[resolved.to_string(self.simple)],
-                    ])
+                if node.get_product()== self.root or node.is_func or node.is_class:
+                    self._handle_externals(src, dst)
 
         self.nodes_cnt = self.id_cnt
         for node, id in self.node_to_id.items():
             self.stitched["nodes"][id] = {"URI": node, "metadata": {}}
+
+    def _handle_internals(self, src, dst):
+        self._assign_id(src.to_string(self.simple))
+        self._assign_id(dst.to_string(self.simple))
+        self.stitched["edges"].append([
+            self.node_to_id[src.to_string(self.simple)],
+            self.node_to_id[dst.to_string(self.simple)],
+        ])
+
+    def _handle_externals(self, src, dst):
+        if ".builtin" in dst.to_string():
+            self.edges_cnt_no_builtin -= 1
+        for resolved in self._resolve(dst):
+            self.resolved_cnt += 1
+            self._assign_id(src.to_string(self.simple))
+            self._assign_id(resolved.to_string(self.simple))
+            self.stitched["edges"].append([
+                self.node_to_id[src.to_string(self.simple)],
+                self.node_to_id[resolved.to_string(self.simple)],
+            ])
 
     def output(self):
         return self.stitched

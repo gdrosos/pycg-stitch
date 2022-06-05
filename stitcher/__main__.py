@@ -31,7 +31,7 @@ def main():
     args = parser.parse_args()
 
     stitcher = Stitcher(args.call_graph, args.simple, args.root)
-    stitcher.stitch()
+    stitcher.stitch_for_rq1()
     output = json.dumps(stitcher.output(), indent=2)
     ReachabilityDetector(stitcher.output(), args.root)
     if args.output:
