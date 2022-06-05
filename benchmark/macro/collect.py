@@ -36,6 +36,12 @@ def unzip_files():
 
     for f in files:
         os.remove(f)
+    
+    files = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f) and f.endswith(".gz")]
+    for f in files:
+        opts = ["tar", "-xf", f]
+        cmd = sp.Popen(opts, stdout=sp.PIPE, stderr=sp.PIPE)
+        cmd.communicate()
 
 def generate_call_graphs():
     packages = [f for f in os.listdir(os.getcwd()) if os.path.isdir(f)]
@@ -48,8 +54,8 @@ def generate_call_graphs():
         files = [f.as_posix() for f in pathlib.Path(pkg).glob('**/*.py')]
         sp.run(["pycg",
                 "--fasten",
-                "--product", pkg.split("-")[0],
-                "--version", pkg.split("-")[1],
+                "--product", pkg.rsplit('-', 1)[0],
+                "--version", pkg.rsplit('-', 1)[1],
                 "--forge", "PyPI",
                 "--max-iter", "3",
                 "--package", pkg] + files + [
