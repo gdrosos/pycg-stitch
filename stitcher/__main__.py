@@ -21,13 +21,24 @@ def main():
         help="The root coordinate, including the product and the version, separated by a colon(:)",
         default=None
     )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output path",
+        default=None
+    )
 
     args = parser.parse_args()
 
     stitcher = Stitcher(args.call_graph, args.simple, args.root)
     stitcher.stitch()
-    stitched = stitcher.output()
-    ReachabilityDetector(stitched, args.root)
+    output = json.dumps(stitcher.output(), indent=2)
+    ReachabilityDetector(stitcher.output(), args.root)
+    if args.output:
+        with open(args.output, "w+") as f:
+            f.write(output)
+    else:
+        print (output)
 
 if __name__ == "__main__":
     main()
