@@ -22,12 +22,12 @@
 # under the License.
 #
 class Node:
-    def __init__(self, uri_str, product=None, super_cls=None, version=None):
+    def __init__(self, uri_str, product=None, super_cls=None, version=None, loc=None):
         self.uri_str = uri_str
         self.product = product
         self.version = version
         self.super_cls = super_cls or []
-
+        self.loc = loc
         if len(uri_str.split("/")) == 5:
             self.internal = False
             self.external = True

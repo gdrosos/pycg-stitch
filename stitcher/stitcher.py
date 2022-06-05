@@ -42,7 +42,7 @@ class Stitcher:
         self.edges_cnt = 0
         self.resolved_cnt = 0
         self.edges_cnt_no_builtin = 0
-
+        self.node_to_metadata = {}
         self._parse_cgs(call_graph_paths)
 
     def stitch_for_rq1(self):
@@ -54,6 +54,7 @@ class Stitcher:
             self.resolved_cnt += len(internal_calls)
             for node in cg.node_list:
                 if node.get_product()== self.root or node.is_func or node.is_class:
+                    self.node_to_metadata[node.to_string(self.simple)] = node.loc
                     self._assign_id(node.to_string(self.simple))
             for src, dst in internal_calls:
                 if node.get_product()== self.root or node.is_func or node.is_class:
@@ -64,7 +65,7 @@ class Stitcher:
 
         self.nodes_cnt = self.id_cnt
         for node, id in self.node_to_id.items():
-            self.stitched["nodes"][id] = {"URI": node, "metadata": {}}
+            self.stitched["nodes"][id] = {"URI": node, "metadata": {"LoC": self.node_to_metadata[node]}}
 
     def _handle_internals(self, src, dst):
         self._assign_id(src.to_string(self.simple))
